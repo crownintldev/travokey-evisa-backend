@@ -2,7 +2,10 @@
 const EVisa = require("../models/evisa");
 const { Response } = require("../utils/helpers/responseHandler");
 const { handleAsync } = require("../utils/helpers/handleAsync");
-const {removeUndefined}=require("../utils/helpers/reuseFunctions")
+const {
+  removeUndefined,
+  onlyIntegerAllowed,
+} = require("../utils/helpers/reuseFunctions");
 const {
   removeMany,
   createApi,
@@ -18,11 +21,13 @@ let model = EVisa;
 let modelName = model.modelName;
 
 exports.create = handleAsync(async (req, res) => {
-  const data = await CreateFormidableHandler(req, res);
-//   if (data.price) {
-//     data.price = Number(data.price);
-//   }
-  // console.log(data)
+  const data = await CreateFormidableHandler(req, res,model);
+  const { visaFee, serviceCharges, selection } = data;
+  data.visaFee = onlyIntegerAllowed(res, visaFee);
+  data.serviceCharges = onlyIntegerAllowed(res, serviceCharges);
+  data.selection = JSON.parse(selection);
+  removeUndefined(data);
+  console.log(data);
   const response = await createApi(model, data);
   return Response(res, 200, `${modelName} Create Successfully`, [response], 1);
 }, modelName);
@@ -30,11 +35,11 @@ exports.create = handleAsync(async (req, res) => {
 exports.update = handleAsync(async (req, res) => {
   const data = await UpdateFormidableHandler(req, res);
   const { deletedFiles, files } = data;
-  removeUndefined(data)
-  console.log(data)
-//   if (price) {
-//     data.price = Number(price);
-//   }
+  removeUndefined(data);
+  console.log(data);
+  //   if (price) {
+  //     data.price = Number(price);
+  //   }
 
   const id = req.params.id;
   const bulkResponse = await BulkWriteForFile({
@@ -44,14 +49,17 @@ exports.update = handleAsync(async (req, res) => {
     deletedFiles,
     model,
   });
-  console.log(bulkResponse);
+  // console.log(bulkResponse);
 
   const updatedDocument = await model.findById(id);
   if (!updatedDocument) {
     return Response(res, 400, "Id Not Found");
   }
   // @ts-ignore
-  const pipeline = createAggregationPipeline({ ids: [updatedDocument],customParams});
+  const pipeline = createAggregationPipeline({
+    ids: [updatedDocument],
+    customParams,
+  });
   // @ts-ignore
   const aggregateResult = await model.aggregate(pipeline);
   const response = aggregateResult.length > 0 ? aggregateResult[0].data : [];
@@ -99,4 +107,3 @@ const customParams = {
     "updatedAt",
   ],
 };
-

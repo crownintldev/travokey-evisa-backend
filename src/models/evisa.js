@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Schema.Types;
 // let aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 
 const evisaSchema = new mongoose.Schema(
@@ -48,7 +49,8 @@ const evisaSchema = new mongoose.Schema(
             "nop",
             "qrs"
         ]
-    }
+    },
+    files:[]
     
     // createdBy: {
     //   type: mongoose.Schema.Types.ObjectId,
@@ -61,5 +63,28 @@ const evisaSchema = new mongoose.Schema(
   },
   { timestamps: true, versionKey: false }
 );
+evisaSchema.statics.allowedFiles = function (files) {
+  console.log(files)
+  const allowedFileTypes = ["image/jpeg", "image/png", "application/pdf", "application/msword"];
+  for (const file of files) {
+    const filetype = file.mimetype ?? file.type
+    if (!allowedFileTypes.includes(filetype)) {
+      throw new Error("Invalid file type. Only images, PDFs, and DOC files are allowed.");
+    }
+  }
+};
+
+// evisaSchema.pre("save", function (next) {
+//   // Check if the files array contains only allowed file types
+//   const allowedFileTypes = ["image/jpeg", "image/png", "application/pdf", "application/msword"];
+//   for (const file of this.files) {
+//     if (!allowedFileTypes.includes(file.type)) {
+//       return next(new Error("Invalid file type. Only images, PDFs, and DOC files are allowed."));
+//     }
+//   }
+//   next(); // Proceed with saving if all files are of allowed types
+// });
+
+
 // visa.plugin(aggregatePaginate);
 module.exports = mongoose.model("EVisa", evisaSchema);

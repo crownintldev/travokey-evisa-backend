@@ -20,7 +20,7 @@ exports.cloudinaryPushingFiles = async (files) => {
       const cloudinaryResponse = await cloudinary.uploader.upload(
         file.filepath,
         {
-          resource_type: "raw",
+          resource_type: "auto",
           // public_id: fileNameWithExtension,
           folder: "hamail",
           name: fileNameWithExtension,

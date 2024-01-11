@@ -3,9 +3,9 @@ const {
   cloudinaryPushingFiles,
   cloudinaryDeleteFiles,
 } = require("./cloudinary");
-const  {Response}  = require("../../helpers/responseHandler");
+const { Response } = require("../../helpers/responseHandler");
 
-exports.CreateFormidableHandler = async (req, res) => {
+exports.CreateFormidableHandler = async (req, res, model) => {
   return new Promise((resolve, reject) => {
     let form = new formidable.IncomingForm();
     form.parse(req, async (err, fields, files) => {
@@ -13,6 +13,14 @@ exports.CreateFormidableHandler = async (req, res) => {
         Response(res, 400, "all fields required");
       }
       let cloudinaryResponses = [];
+      if (files.files && files.files.length > 0 && model.allowedFiles) {
+        try {
+          model.allowedFiles(files.files);
+        } catch (error) {
+          console.error(error.message);
+          return Response(res, 400, error.message);
+        }
+      }
       cloudinaryResponses = await cloudinaryPushingFiles(files);
       const extractFirstItems = (data) =>
         Object.fromEntries(

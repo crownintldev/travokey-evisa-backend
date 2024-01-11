@@ -3,12 +3,11 @@ const {Response} = require('./responseHandler')
 
 exports.removeUndefined = (data) => {
   for (let key in data) {
-    if (data[key] === undefined || data[key] === "") {
+    if (data[key] === undefined || data[key] === "" || (Array.isArray(data[key]) && data[key].length === 0)) {
       delete data[key];
     }
   }
 };
-
 
 exports.capitalizeFirstLetter = (name) => {
   return name.charAt(0).toUpperCase() + name.slice(1);
@@ -33,6 +32,13 @@ exports.IsArray=(data,res)=>{
   }
  }
 
+ exports.onlyIntegerAllowed = (res, number) => {
+  if (number !== undefined && /^\d+$/.test(number)) {
+    return (number = Number(number));
+  } else {
+    return Response(res, 400, "Missing or contains non-numeric characters");
+  }
+};
 
 
 
