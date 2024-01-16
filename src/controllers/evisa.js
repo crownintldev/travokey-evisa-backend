@@ -9,13 +9,13 @@ const {
 const {
   removeMany,
   createApi,
-  CreateFormidableHandler,
   UpdateFormidableHandler,
   listCommonAggregationFilterize,
   createAggregationPipeline,
   lookupUnwindStage,
   BulkWriteForFile,
 } = require("../utils/common/controllerFunction");
+const { CreateFormidableHandler } = require("../utils/googledrive");
 
 let model = EVisa;
 let modelName = model.modelName;
@@ -27,7 +27,7 @@ exports.create = handleAsync(async (req, res) => {
   data.serviceCharges = onlyIntegerAllowed(res, serviceCharges);
   data.selection = JSON.parse(selection);
   removeUndefined(data);
-  console.log(data);
+  // console.log(data);
   const response = await createApi(model, data);
   return Response(res, 200, `${modelName} Create Successfully`, [response], 1);
 }, modelName);

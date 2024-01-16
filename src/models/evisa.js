@@ -64,7 +64,6 @@ const evisaSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 evisaSchema.statics.allowedFiles = function (files) {
-  console.log(files)
   const allowedFileTypes = ["image/jpeg", "image/png", "application/pdf", "application/msword"];
   for (const file of files) {
     const filetype = file.mimetype ?? file.type
