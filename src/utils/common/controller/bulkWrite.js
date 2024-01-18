@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 /**
  * Perform a bulk write operation for a file.
  * @param {Object} options - Options for the bulk write operation.
@@ -22,14 +24,15 @@ exports.BulkWriteForFile = async ({
 }) => {
   const hasFilesToAdd = files && files.length > 0;
   const hasFilesToDelete = deletedFiles && deletedFiles.length > 0;
-
+  
+  const validId = new mongoose.Types.ObjectId(id);
+  
   const updateOperations = [];
-  const currentFiles = currentDocument.files || [];
 
   // Always update the main data
   updateOperations.push({
     updateOne: {
-      filter: { _id: id },
+      filter: { _id: validId },
       update: { $set: data },
     },
   });
@@ -37,7 +40,7 @@ exports.BulkWriteForFile = async ({
   if (hasFilesToAdd) {
     updateOperations.push({
       updateOne: {
-        filter: { _id: id },
+        filter: { _id: validId },
         update: { $addToSet: { files: { $each: files } } }, // Directly using files
       },
     });
@@ -47,7 +50,7 @@ exports.BulkWriteForFile = async ({
   if (hasFilesToDelete) {
     updateOperations.push({
       updateOne: {
-        filter: { _id: id },
+        filter: { _id: validId },
         update: { $pull: { files: { [fileId]: { $in: deletedFiles } } } },
       },
     });

@@ -65,10 +65,10 @@ exports.create = handleAsync(async (req, res) => {
     removeUndefined(data);
     //  console.log(data);
     const evisa = await createApi(model, data);
-    //  @ts-ignore
+
     const response = await aggregationByIds({
       model,
-      data: evisa._id,
+      ids: evisa._id,
       customParams,
     });
     return Response(res, 200, `${modelName} Create Successfully`, response);
@@ -76,6 +76,10 @@ exports.create = handleAsync(async (req, res) => {
 }, modelName);
 
 exports.update = handleAsync(async (req, res) => {
+  const id = req.params.id;
+  if (!id) {
+    return Response(res, 400, "Id Not Found");
+  }
   let form = new formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
     if (err) {
@@ -84,40 +88,34 @@ exports.update = handleAsync(async (req, res) => {
     const extractData = extractArrayItems(fields);
     req.files = files?.files;
     extractData.foldering = ["evisa"];
-    const data = await UpdateFilesHandleGoogleDrive(
+    const { data, files: newFiles } = await UpdateFilesHandleGoogleDrive(
       req,
       res,
       model,
       extractData
     );
+
     removeUndefined(data);
     const { deletedFiles, ...restOfData } = data;
+    data.files = "";
+    removeUndefined(data);
     let updateData = restOfData;
-    const id = req.params.id;
+
     const bulkResponse = await BulkWriteForFile({
       id,
       data: updateData,
-      files: data?.files,
+      files: newFiles,
       //fileId is the key this is main field of files, use for deleting
       fileId: "fileId",
       deletedFiles,
       model,
     });
-    // console.log(bulkResponse);
-
-    const updatedDocument = await model.findById(id);
- 
-    if (!updatedDocument) {
-      return Response(res, 400, "Id Not Found");
-    }
-    // @ts-ignore
-    const pipeline = createAggregationPipeline({
-      ids: [updatedDocument],
+  
+    const response = await aggregationByIds({
+      model,
+      ids: [id],
       customParams,
     });
-    // @ts-ignore
-    const aggregateResult = await model.aggregate(pipeline);
-    const response = aggregateResult.length > 0 ? aggregateResult[0].data : [];
     return Response(res, 200, "ok", response);
   });
 }, modelName);
@@ -153,8 +151,8 @@ const customParams = {
     duration: "$duration.name",
     description: 1,
     visaFee: 1,
-    serviceCharges:1,
-    selection:1,
+    serviceCharges: 1,
+    selection: 1,
     files: 1,
     createdAt: 1,
     updatedAt: 1,

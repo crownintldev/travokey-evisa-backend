@@ -47,13 +47,13 @@ exports.listCommonAggregationFilterize = async (
  * @param {Object} options - Options for the bulk write operation.
  * @param {Model} options.model - The ID of the document to update.
  * @param {Object} options.customParams - The data to set in the update.
- * @param {Object} options.data - The MongoDB model to use for the bulk write.
+ * @param {Object} options.ids - The MongoDB model to use for the bulk write.
  * @param {Function} [options.ownPipeline] - Optional MongoDB session.
  * @returns {Promise<Object>} 
  */
 
-exports.aggregationByIds=async({model,data,customParams,ownPipeline})=>{
-  const document = data && data?.length? data : [data];
+exports.aggregationByIds=async({model,ids,customParams,ownPipeline})=>{
+  const document = ids && ids?.length? ids : [ids];
   let pipeline;
     if(customParams){
           // @ts-ignore

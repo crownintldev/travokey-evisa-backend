@@ -98,11 +98,11 @@ exports.UpdateFilesHandleGoogleDrive = async (req, res, model, data) => {
       // if (!deleteFilesResponse) {
       //   return Response(res, 400, "deleted Files not Found");
       // }
-      data.deletedFiles = deletedFiles;
+     data.deletedFiles = deletedFiles;
     }
 
     const newData = {
-      ...data,
+      data,
       files: googleDriveResponses,
     };
 
