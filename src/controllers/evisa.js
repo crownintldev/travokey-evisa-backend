@@ -7,8 +7,6 @@ const {
   removeUndefined,
   extractArrayItems,
   onlyIntegerAllowed,
-} = require("../utils/helpers/reuseFunctions");
-const {
   removeMany,
   createApi,
   CreateHandleFilesGoogleDrive,
@@ -18,10 +16,30 @@ const {
   lookupUnwindStage,
   BulkWriteForFile,
   aggregationByIds,
+} = require("@tablets/express-mongoose-api");
+const {
+//   removeUndefined,
+//   extractArrayItems,
+//   onlyIntegerAllowed,
+// } = require("../utils/helpers/reuseFunctions");
+// const {
+//   removeMany,
+//   createApi,
+//   CreateHandleFilesGoogleDrive,
+//   UpdateFilesHandleGoogleDrive,
+//   listCommonAggregationFilterize,
+//   createAggregationPipeline,
+//   lookupUnwindStage,
+//   BulkWriteForFile,
+  // aggregationByIds,
 } = require("../utils/common/controllerFunction");
 
 let model = EVisa;
 let modelName = model.modelName;
+
+function isValidMongooseObjectId(id) {
+  return /^[0-9a-fA-F]{24}$/.test(id);
+}
 
 exports.create = handleAsync(async (req, res) => {
   let form = new formidable.IncomingForm();
@@ -34,6 +52,14 @@ exports.create = handleAsync(async (req, res) => {
     extractData.foldering = ["evisa"];
     let { destination, category, type, duration } = extractData;
 
+    if (
+      !isValidMongooseObjectId(destination) ||
+      !isValidMongooseObjectId(category) ||
+      !isValidMongooseObjectId(type) ||
+      !isValidMongooseObjectId(duration)
+    ) {
+      return Response(res, 400, "Invalid ID format");
+    }
     const checkAlreadyinDb = await model.findOne({
       $and: [{ destination }, { category }, { type }, { duration }],
     });
@@ -63,15 +89,14 @@ exports.create = handleAsync(async (req, res) => {
       data.selection = JSON.parse(selection);
     }
     removeUndefined(data);
-    //  console.log(data);
     const evisa = await createApi(model, data);
 
     const response = await aggregationByIds({
       model,
-      ids: evisa._id,
+      ids: [evisa._id],
       customParams,
     });
-    return Response(res, 200, `${modelName} Create Successfully`, response);
+    return Response(res, 200, `${modelName} Create Successfully`, evisa);
   });
 }, modelName);
 
@@ -110,7 +135,7 @@ exports.update = handleAsync(async (req, res) => {
       deletedFiles,
       model,
     });
-  
+
     const response = await aggregationByIds({
       model,
       ids: [id],
