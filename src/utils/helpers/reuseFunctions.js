@@ -1,9 +1,13 @@
-const constants = require('./constants')
-const {Response} = require('./responseHandler')
+const constants = require("./constants");
+const { Response } = require("./responseHandler");
 
 exports.removeUndefined = (data) => {
   for (let key in data) {
-    if (data[key] === undefined || data[key] === "" || (Array.isArray(data[key]) && data[key].length === 0)) {
+    if (
+      data[key] === undefined ||
+      data[key] === "" ||
+      (Array.isArray(data[key]) && data[key].length === 0)
+    ) {
       delete data[key];
     }
   }
@@ -21,18 +25,18 @@ exports.isAllSameinArray = (dataArray) => {
 };
 
 // exampleCamelCaseString to 'Example Camel Case String'
-exports.capitalizeCamelSpace = name => {
-  const capitalized =  name.charAt(0).toUpperCase() + name.slice(1)
-  return capitalized.replace(/([A-Z])/g, ' $1').trim()
-}
+exports.capitalizeCamelSpace = (name) => {
+  const capitalized = name.charAt(0).toUpperCase() + name.slice(1);
+  return capitalized.replace(/([A-Z])/g, " $1").trim();
+};
 
-exports.IsArray=(data,res)=>{
+exports.IsArray = (data, res) => {
   if (!data || !Array.isArray(data) || data.length === 0) {
     return Response(res, 400, "Not Found Ids");
   }
- }
+};
 
- exports.onlyIntegerAllowed = (res, number) => {
+exports.onlyIntegerAllowed = (res, number) => {
   if (number !== undefined && /^\d+$/.test(number)) {
     return (number = Number(number));
   } else {
@@ -40,9 +44,12 @@ exports.IsArray=(data,res)=>{
   }
 };
 
+exports.extractArrayItems = (data) =>
+  Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [key, value[0]])
+  );
 
-
- // const oneValueAllowed = (value) => {
+// const oneValueAllowed = (value) => {
 //   if (value.processing) {
 //     return { ...value, confirmed: undefined };
 //   } else if (value.confirmed) {
@@ -50,4 +57,3 @@ exports.IsArray=(data,res)=>{
 //   }
 //   return value;
 // };
-
