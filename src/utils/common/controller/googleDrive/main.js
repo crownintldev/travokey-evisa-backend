@@ -61,19 +61,35 @@ exports.CreateHandleFilesGoogleDrive = async (req, res, model, data) => {
   }
 };
 
+ function allowedFiles(files) {
+  const allowedFileTypes = [
+    "image/jpeg",
+    "image/png",
+    "application/pdf",
+    "application/msword",
+  ];
+
+  for (const file of files) {
+    const filetype = file.mimetype ?? file.type;
+    if (!allowedFileTypes.includes(filetype)) {
+      return res.json("dsfsdf")
+      return { error: "Invalid file type. Only images, PDFs, and DOC files are allowed." };
+    }
+  }
+  return null; // Return null if no error
+};
+
 exports.UpdateFilesHandleGoogleDrive = async (req, res, model, data) => {
   let foldering = data.foldering;
   let files = req.files;
   // allowed files is int schema methods check the allowed files
-  if (files && files.length > 0 && model.allowedFiles) {
-    try {
-      model.allowedFiles(files);
-    } catch (error) {
-      // console.error(error.message);
-      return Response(res, 400, error.message);
-    }
-  }
-
+  // if (files && files.length > 0 && model.allowedFiles) {
+  //   const errorMessage = model.allowedFiles(files,res);
+  //   if (errorMessage) {
+  //     // Handle the error message
+  //     return Response(res, 400, "Invalid");
+  //   }
+  // }
   try {
     // Upload files to Google Drive
     const authClient = await authorize();

@@ -9,8 +9,8 @@ const {
   onlyIntegerAllowed,
   removeMany,
   createApi,
-  CreateHandleFilesGoogleDrive,
-  UpdateFilesHandleGoogleDrive,
+  // CreateHandleFilesGoogleDrive,
+  // UpdateFilesHandleGoogleDrive,
   listCommonAggregationFilterize,
   createAggregationPipeline,
   lookupUnwindStage,
@@ -18,19 +18,19 @@ const {
   aggregationByIds,
 } = require("@tablets/express-mongoose-api");
 const {
-//   removeUndefined,
-//   extractArrayItems,
-//   onlyIntegerAllowed,
-// } = require("../utils/helpers/reuseFunctions");
-// const {
-//   removeMany,
-//   createApi,
-//   CreateHandleFilesGoogleDrive,
-//   UpdateFilesHandleGoogleDrive,
-//   listCommonAggregationFilterize,
-//   createAggregationPipeline,
-//   lookupUnwindStage,
-//   BulkWriteForFile,
+  //   removeUndefined,
+  //   extractArrayItems,
+  //   onlyIntegerAllowed,
+  // } = require("../utils/helpers/reuseFunctions");
+  // const {
+  //   removeMany,
+  //   createApi,
+  CreateHandleFilesGoogleDrive,
+  UpdateFilesHandleGoogleDrive,
+  //   listCommonAggregationFilterize,
+  //   createAggregationPipeline,
+  //   lookupUnwindStage,
+  //   BulkWriteForFile,
   // aggregationByIds,
 } = require("../utils/common/controllerFunction");
 
@@ -119,7 +119,6 @@ exports.update = handleAsync(async (req, res) => {
       model,
       extractData
     );
-
     removeUndefined(data);
     const { deletedFiles, ...restOfData } = data;
     data.files = "";

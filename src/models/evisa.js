@@ -63,14 +63,22 @@ const evisaSchema = new mongoose.Schema(
   },
   { timestamps: true, versionKey: false }
 );
-evisaSchema.statics.allowedFiles = function (files) {
-  const allowedFileTypes = ["image/jpeg", "image/png", "application/pdf", "application/msword"];
+evisaSchema.statics.allowedFiles = function (files,res) {
+  const allowedFileTypes = [
+    "image/jpeg",
+    "image/png",
+    "application/pdf",
+    "application/msword",
+  ];
+
   for (const file of files) {
-    const filetype = file.mimetype ?? file.type
+    const filetype = file.mimetype ?? file.type;
     if (!allowedFileTypes.includes(filetype)) {
-      throw new Error("Invalid file type. Only images, PDFs, and DOC files are allowed.");
+      return res.json("dsfsdf")
+      return { error: "Invalid file type. Only images, PDFs, and DOC files are allowed." };
     }
   }
+  return null; // Return null if no error
 };
 
 // evisaSchema.pre("save", function (next) {
